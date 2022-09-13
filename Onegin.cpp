@@ -1,37 +1,150 @@
 #include <stdio.h>
-#include <cstring>
+#include <string.h>
+#include <sys/stat.h>
+#include <ctype.h>
+#include <stdlib.h>
 #define ASSERT(condition)                                                             \
         {                                                                             \
         if (!(condition))                                                             \
-            fprintf(stderr, "Error in '%s' in line %d in file %s in %s\n",  \
+            fprintf(stderr, "Error in '%s' in line %d in file %s in %s\n",            \
                     #condition, __LINE__, __FILE__, __PRETTY_FUNCTION__);             \
         }
 
 
-void printf_arr(char* arr[], int n)
-{
-    // ASSERT(arr != NULL);
 
-    for (int k = 0; k < n; k++)
+int read_file_data(FILE* file, char data[])
+{
+    ASSERT(file != NULL);
+    ASSERT(data != NULL);
+
+    // fseek(file, 0L, SEEK_END); //сдвигает курсор в конец файла
+    // int file_size = ftell(file); //возвращает положение "курсора"
+    // fseek(file, 0L, SEEK_SET); //сдвигает курсор в начало файла
+
+    struct stat buf;
+
+    fstat(fileno(file), &buf);
+
+    int file_size = buf.st_size;
+
+    return fread(data, sizeof(char), file_size, file);
+}
+
+
+int open_read_close_file(const char file_name[], char data[], char data_0[])
+{
+    ASSERT(file_name != NULL);
+    ASSERT(data != NULL);
+    ASSERT(data_0 != NULL);
+
+    FILE* file = fopen(file_name, "r");
+
+    int n = read_file_data(file, data);
+    strncpy(data_0, data, n);
+
+    fclose(file);
+
+    return n;
+}
+
+
+int create_ptr_arr(char* data_ptr, char data[], char* arr[], int n)
+{
+    ASSERT(data_ptr != NULL);
+    ASSERT(data != NULL);
+    ASSERT(arr != NULL);
+
+    int arr_length = 0, k = 0, str_length = 0;
+
+    for (int i = 0; i < n; i++)
     {
-        printf("%s\n", arr[k]);
+        if (data[i] == '\n')
+        {
+            data[i] = '\0';
+            arr[k++] = data_ptr;
+            data_ptr += str_length + 1;
+            arr_length++;
+            str_length = 0;
+        }
+        else
+            str_length++;
+    }
+
+    arr[arr_length] = NULL;
+
+    return arr_length;
+}
+
+
+void printf_arr(char* arr[])
+{
+    ASSERT(arr != NULL);
+
+    while (*arr != NULL)
+    {
+        printf("%s\n", *arr++);
     }
 }
 
 
-void buble_sort(char* arr[], int n)
+void del_non_letters(char str[], char new_str[])    // сделать функцию, возвращающую строку без знаков пунктуации
+{
+
+}
+
+
+void reverse_str(const char str[], int length, char str_rev[])
+{
+    int i = length-1, j = 0;
+
+    for (i, j; i >= 0; i--, j++)
+    {
+        str_rev[j] = str[i];
+    }
+}
+
+
+int cmp_func1(const void* str1_ptr, const void* str2_ptr)   // сравнение строк слева-направо
+{
+    ASSERT(str1_ptr != NULL);
+    ASSERT(str2_ptr != NULL);
+
+    const char* str1 = *(const char**)str1_ptr;
+    const char* str2 = *(const char**)str2_ptr;
+
+    return strcmp(str1, str2);  // заменить на собственный strcmp, удаляющий не буквы
+}
+
+
+int cmp_func2(const void* str1_ptr, const void* str2_ptr)   // сравнение строк справа-налево
+{
+    ASSERT(str1_ptr != NULL);
+    ASSERT(str2_ptr != NULL);
+
+    const char* str1 = *(const char**)str1_ptr;
+    const char* str2 = *(const char**)str2_ptr;
+
+    int str1_length = strlen(str1);
+    int str2_length = strlen(str2);
+    char str1_rev[100] = {};
+    char str2_rev[100] = {};
+
+    reverse_str(str1, str1_length, str1_rev);
+    reverse_str(str2, str2_length, str2_rev);
+
+    return strcmp(str1_rev, str2_rev);  // заменить на собственный strcmp, удаляющий знаки пунктуации
+}
+
+
+void buble_sort(char* arr[], int n, int (*cmp_func)(const void* str1, const void* str2))
 {
     ASSERT(arr != NULL);
-
-    printf_arr(arr, n);
-
-    printf("\n");
 
     for (int i = n; i >= 0; i--)
     {
         for (int j = 0; j < i-1; j++)
         {
-            printf("\"%s\" \"%s\" -> ", arr[j], arr[j+1]);
+            // printf("\"%s\" \"%s\" -> ", arr[j], arr[j+1]);
 
             if (strcmp(arr[j], arr[j+1]) >= 0)
             {
@@ -40,50 +153,96 @@ void buble_sort(char* arr[], int n)
                 arr[j+1] = temp;
             }
 
-            printf("\"%s\" \"%s\"\n", arr[j], arr[j+1]);
+            // printf("\"%s\" \"%s\"\n", arr[j], arr[j+1]);
         }
 
-        printf("\n");
+        // printf("\n");
     }
+}
 
-    printf_arr(arr, n);
 
+void sort_and_output(char* arr[], int length, char data_0[])
+{
+    ASSERT(arr != NULL);
+    ASSERT(data_0 != NULL);
+
+
+    printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  \n"
+           "СОБСТВЕННАЯ СОРТИРОВКА (1):"
+           "\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+
+    buble_sort(arr, length, cmp_func1);
+
+    printf_arr(arr);
+    printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n");
+
+
+    printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"
+           "СОБСТВЕННАЯ СОРТИРОВКА (2):"
+           "\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+
+    buble_sort(arr, length, cmp_func2);
+
+    printf_arr(arr);
+    printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n");
+
+
+
+    printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"
+           "ВСТРОЕННАЯ СОРТИРОВКА (1):"
+           "\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+
+    qsort(arr, (size_t) length, sizeof(char*), cmp_func1);
+
+    printf_arr(arr);
+    printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n");
+
+
+    printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"
+           "ВСТРОЕННАЯ СОРТИРОВКА (2):"
+           "\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+
+    qsort(arr, (size_t) length, sizeof(char*), cmp_func2);
+
+    printf_arr(arr);
+    printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n");
+
+
+
+    printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"
+           "НАЧАЛЬНЫЙ МАССИВ:"
+           "\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+    printf("%s", data_0);
+    printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n");
 }
 
 
 int main()
 {
-    char* arr[1000] = {};
-    char data[1000] = {};
+    char* arr[100] = {};
+    char data_0[2000] = {};
+    char data[2000] = {};
     char* data_ptr = data;
     const char file_name[] = "text.txt";
-    int n = 0;
 
-    FILE* file = fopen(file_name, "r");
 
-    n = fread(data, sizeof(char), 1000, file);
+    // сделать динамическую память (глава 8.7 и страница 242)
+    // отдельная библиотека для считывания и обработки файлов
 
-    fclose(file);
+    // char *data = nullptr;
 
-    int length = 0, k = 0, count = 0;
+    // void *temp = calloc(1000, sizeof(char));
+    // free(temp);
 
-    for (int i = 0; i < n; i++)
-    {
-        if (*data_ptr == '\n')
-        {
-            data[i] = '\0';
-            data_ptr -= count;
-            arr[k++] = data_ptr;
-            data_ptr += count;
-            length++;
-            count = 0;
-        }
-        else
-            count++;
-        data_ptr++;
-    }
+    // if (!temp)  return 0;
 
-    buble_sort(arr, length);
+    // data = (char *) temp;
+
+
+    int n = open_read_close_file(file_name, data, data_0);
+    int arr_length = create_ptr_arr(data_ptr, data, arr, n);
+
+    sort_and_output(arr, arr_length, data_0);
 
     return 0;
 }
