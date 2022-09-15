@@ -62,7 +62,7 @@ int create_ptr_arr(char* data_ptr, char data[], char* arr[], int n)    // соз
         {
             data[i] = '\0';
             arr[k++] = data_ptr;
-            data_ptr += str_length + 1;
+            data_ptr += ++str_length;
             arr_length++;
             str_length = 0;
         }
@@ -98,9 +98,9 @@ int str_cmp_letters_only(const char* string1, const char* string2)  // срав�
     flag1 = isalpha(string1[i1]);
     flag2 = isalpha(string2[i2]);
 
-    while((i1 <= length1) & (i2 <= length2))
+    while((i1 <= length1) && (i2 <= length2))
     {
-        while (!(flag1 & flag2))
+        while (!(flag1 && flag2))
         {
             if (!flag1)
                 flag1 = isalpha(string1[++i1]);
@@ -191,7 +191,7 @@ void buble_sort(char* arr[], int n, int (*cmp_func)(const void* str1, const void
 }
 
 
-void sort_and_output(char* arr[], int length, char data_0[])    // сортировки и вывод массивов
+void sort_and_output(char* arr[], int arr_length, char data_0[])    // сортировки и вывод массивов
 {
     ASSERT(arr != NULL);
     ASSERT(data_0 != NULL);
@@ -201,7 +201,7 @@ void sort_and_output(char* arr[], int length, char data_0[])    // сортир�
            "СОБСТВЕННАЯ СОРТИРОВКА (прямой порядок):"
            "\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 
-    buble_sort(arr, length, cmp_func1);
+    buble_sort(arr, arr_length, cmp_func1);
 
     printf_arr(arr);
     printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n");
@@ -211,7 +211,7 @@ void sort_and_output(char* arr[], int length, char data_0[])    // сортир�
            "СОБСТВЕННАЯ СОРТИРОВКА (обратный порядок):"
            "\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 
-    buble_sort(arr, length, cmp_func2);
+    buble_sort(arr, arr_length, cmp_func2);
 
     printf_arr(arr);
     printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n");
@@ -222,7 +222,7 @@ void sort_and_output(char* arr[], int length, char data_0[])    // сортир�
            "ВСТРОЕННАЯ СОРТИРОВКА (прямой порядок):"
            "\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 
-    qsort(arr, (size_t) length, sizeof(char*), cmp_func1);
+    qsort(arr, (size_t) arr_length, sizeof(char*), cmp_func1);
 
     printf_arr(arr);
     printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n");
@@ -232,7 +232,7 @@ void sort_and_output(char* arr[], int length, char data_0[])    // сортир�
            "ВСТРОЕННАЯ СОРТИРОВКА (обратный порядок):"
            "\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 
-    qsort(arr, (size_t) length, sizeof(char*), cmp_func2);
+    qsort(arr, (size_t) arr_length, sizeof(char*), cmp_func2);
 
     printf_arr(arr);
     printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n");
@@ -258,15 +258,6 @@ int main()
 
     // сделать динамическую память (глава 8.7 и страница 242)
     // отдельная библиотека для считывания и обработки файлов
-
-    // char *data = nullptr;
-
-    // void *temp = calloc(1000, sizeof(char));
-    // free(temp);
-
-    // if (!temp)  return 0;
-
-    // data = (char *) temp;
 
 
     int n = open_read_close_file(file_name, data, data_0);
