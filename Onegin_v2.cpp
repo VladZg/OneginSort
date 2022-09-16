@@ -3,16 +3,24 @@
 #include <sys/stat.h>
 #include <ctype.h>
 #include <stdlib.h>
-#define ASSERT(condition)                                                             \
-        {                                                                             \
-        if (!(condition))                                                             \
-            fprintf(stderr, "Error in '%s' in line %d in file %s in %s\n",            \
-                    #condition, __LINE__, __FILE__, __PRETTY_FUNCTION__);             \
-        }
+
+// #define NDEBUG
+#include "defines.h"
 
 
 
-int read_file_data(FILE* file, char** data_ptr, int file_size)    // считывание файла в строку
+void printf_arr(char* arr[])                                                               // распечатка массива
+{
+    ASSERT(arr != NULL);
+
+    while (*arr != NULL)
+    {
+        printf("%s\n", *arr++);
+    }
+}
+
+
+int read_file_data(FILE* file, char** data_ptr, int file_size)                             // считывание файла в строку
 {
     ASSERT(file != NULL);
     ASSERT(data_ptr != NULL);
@@ -27,15 +35,27 @@ int read_file_data(FILE* file, char** data_ptr, int file_size)    // считы�
 }
 
 
-int open_read_close_file(const char* file_name, char** data_ptr, char** data_0_ptr)    // открытие, считывание, закрытие файла
+void write_data_file(FILE* fileout, char* arr[])                                           // запись массива в файл
 {
-    ASSERT(file_name != NULL);
+    ASSERT(fileout != 0);
+    ASSERT(arr != 0);
+
+    while (*arr != NULL)
+    {
+        fputs(*arr++, fileout);
+        fputs("\n", fileout);
+    }
+}
+
+
+int open_read_close_file(char** data_ptr, char** data_0_ptr)                               // открытие, считывание, закрытие файла
+{
     ASSERT(data_ptr != NULL);
     ASSERT(data_0_ptr != NULL);
 
-    FILE* file = fopen(file_name, "r");
-    struct stat buf;
+    FILE* file = fopen(FILENAME_INPUT, "r");
 
+    struct stat buf;
     fstat(fileno(file), &buf);
     int file_size = buf.st_size;
 
@@ -55,82 +75,8 @@ int open_read_close_file(const char* file_name, char** data_ptr, char** data_0_p
 }
 
 
-void printf_arr(char* arr[])    // распечатка массива
-{
-    ASSERT(arr != NULL);
-
-    while (*arr != NULL)
-    {
-        printf("%s\n", *arr++);
-    }
-}
-
-
-int cymb_count(char cymb, char* string)
-{
-    int count = 0;
-
-    while (*string != '\0')
-    {
-        if (*string++ == cymb)
-            count++;
-    }
-
-    return count;
-}
-
-
-int is_letter(char cymb)
-{
-    if (isalpha(cymb) || (cymb == '\0'))
-        return 1;
-
-    return 0;
-}
-
-
-int strcmp_letters_only(const char* string1, const char* string2)  // сравнение строк без знаков пунктуации
-{
-    ASSERT(string1 != NULL);
-    ASSERT(string2 != NULL);
-
-    int flag1 = is_letter(*string1), flag2 = is_letter(*string2);
-
-    while(*string1 != '\0')
-    {
-        while (!(flag1 && flag2))
-        {
-            if (!flag1)
-                flag1 = is_letter(*(++string1));
-
-            if (!flag2)
-                flag2 = is_letter(*(++string2));
-        }
-
-        if ((*string1 == '\0') || (*string2 == '\0'))
-            return 0;
-
-        if (*string1 != *string2)
-            break;
-
-        flag1 = is_letter(*(++string1));
-        flag2 = is_letter(*(++string2));
-    }
-
-    return *string1 - *string2;
-}
-
-
-int cmp_func1(const void* str1_ptr, const void* str2_ptr)   // сравнение строк слева-направо
-{
-    ASSERT(str1_ptr != NULL);
-    ASSERT(str2_ptr != NULL);
-
-    return strcmp_letters_only(*(const char**) str1_ptr, *(const char**) str2_ptr);
-}
-
-
-void create_ptr_arr(char** data_ptr, char* arr[], int data_length, int arr_length)    // заполнение массива указателей на строки
+void create_ptr_arr(char** data_ptr, char* arr[],
+                    int data_length, int arr_length)                                       // заполнение массива указателей на строки
 {
     ASSERT(data_ptr != NULL);
     ASSERT(arr != NULL);
@@ -157,7 +103,127 @@ void create_ptr_arr(char** data_ptr, char* arr[], int data_length, int arr_lengt
 }
 
 
-void buble_sort(char* arr[], size_t arr_length, int size, int (*cmp_func)(const void* str1, const void* str2))    // собственная сортировка (пузырьком)
+int cymb_count(char cymb, char* string)                                                    // подсчёт кол-ва заданных символов в строке
+{
+    ASSERT(string != NULL);
+
+    int count = 0;
+
+    while (*string != '\0')
+    {
+        if (*string++ == cymb)
+            count++;
+    }
+
+    return count;
+}
+
+
+int is_letter_or_0(char cymb)                                                              // проверка на небукву или \0
+{
+    if (isalpha(cymb) || (cymb == '\0'))
+        return 1;
+
+    return 0;
+}
+
+
+void skip_non_letters(const char** string1, const char** string2, const int direction)     // пропускание первых небукв
+{
+    ASSERT(string1 != NULL);
+    ASSERT(string2 != NULL);
+
+    int flag1 = is_letter_or_0(**string1), flag2 = is_letter_or_0(**string2);
+
+    while (!(flag1 && flag2))
+    {
+        if (!flag1)
+            *string1 += direction;
+            flag1 = is_letter_or_0(*((*string1)));
+
+        if (!flag2)
+            *string2 += direction;
+            flag2 = is_letter_or_0(*(*string2));
+    }
+}
+
+
+int strcmp_letters_only_func1(const char** string1, const char** string2)                  // сравнение строк без знаков пунктуации
+{
+    ASSERT(string1 != NULL);
+    ASSERT(string2 != NULL);
+
+    skip_non_letters(string1, string2, 1);
+
+    while(**string1 == **string2)
+    {
+        if (**string1 == '\0')
+            return 0;
+
+        (*string1)++;
+        (*string2)++;
+    }
+
+    return **string1 - **string2;
+}
+
+
+int strcmp_letters_only_func2(const char** string1, const char** string2)                  // сравнение строк без знаков пунктуации
+{
+    ASSERT(string1 != NULL);
+    ASSERT(string2 != NULL);
+
+    *string1 += strlen(*string1) - 1;
+    *string2 += strlen(*string2) - 1;
+
+    skip_non_letters(string1, string2, -1);
+
+    while(**string1 == **string2)
+    {
+        if (**string1 == '\0')
+            return 0;
+
+        (*string1)--;
+        (*string2)--;
+    }
+    return **string1 - **string2;
+}
+
+
+int cmp_func(const void* str1_ptr, const void* str2_ptr,
+             int (*strcmp_letters_only_func)(const char** string1, const char** string2))  // общая функция сравнения void* строк
+{
+    ASSERT(str1_ptr != NULL);
+    ASSERT(str2_ptr != NULL);
+    ASSERT (strcmp_letters_only_func != NULL);
+
+    const char *str1 = *(const char**) str1_ptr;
+    const char *str2 = *(const char**) str2_ptr;
+
+    return strcmp_letters_only_func(&str1, &str2);
+}
+
+
+int cmp_func1(const void* str1_ptr, const void* str2_ptr)                                  // функция сравнения слева-направо
+{
+    ASSERT(str1_ptr != NULL);
+    ASSERT(str2_ptr != NULL);
+
+    return cmp_func(str1_ptr, str2_ptr, strcmp_letters_only_func1);
+}
+
+
+int cmp_func2(const void* str1_ptr, const void* str2_ptr)                                  // функция сравнения справа-налево
+{
+    ASSERT(str1_ptr != NULL);
+    ASSERT(str2_ptr != NULL);
+
+    return cmp_func(str1_ptr, str2_ptr, strcmp_letters_only_func2);
+}
+
+
+void buble_sort(char* arr[], size_t arr_length, int size,
+                int (*cmp_func)(const void* str1, const void* str2))                       // собственная сортировка (пузырьком)
 {
     ASSERT(arr != NULL);
     ASSERT(cmp_func != NULL);
@@ -177,59 +243,108 @@ void buble_sort(char* arr[], size_t arr_length, int size, int (*cmp_func)(const 
 }
 
 
-void sort_and_output(char* arr[], int arr_length, char* data_0)    // сортировки и вывод массивов
+// void buble_sort(void* arr, size_t arr_length, size_t size,
+//                 int (*cmp_func)(const void* str1, const void* str2))                       // обобщённая собственная сортировка (пузырьком)
+// {
+//     ASSERT(arr != NULL);
+//     ASSERT(cmp_func != NULL);
+//
+//     for (int i = (int) arr_length; i >= 0; i--)
+//     {
+//         for (int j = 0; j < i-1; j++)
+//         {
+//             if (cmp_func(&arr[j*size], &arr[(j+1)*size]) >= 0)
+//             {
+//                 void* temp = arr[j*size];
+//                 arr[j*size] = arr[(j+1)*size];
+//                 arr[(j+1)*size] = temp;
+//             }
+//         }
+//     }
+// }
+
+
+void sort_and_output(FILE* fileout_sorted, FILE* fileout_original,
+                     char* arr[], int arr_length, char* data_0)                            // сортировки и вывод массивов
+{
+    ASSERT(arr != NULL);
+    ASSERT(data_0 != NULL);
+    ASSERT(fileout_sorted != NULL);
+    ASSERT(fileout_original != NULL);
+
+
+    fputs("======================================================================"
+          "\nСОБСТВЕННАЯ СОРТИРОВКА (прямой порядок):\n"
+          "======================================================================"
+          "\n", fileout_sorted);
+
+    buble_sort(arr, (size_t) arr_length, sizeof(char*), cmp_func1);
+    write_data_file(fileout_sorted, arr);
+
+    fputs("======================================================================"
+          "\n\n", fileout_sorted);
+
+
+    fputs("======================================================================"
+          "\nСОБСТВЕННАЯ СОРТИРОВКА (обратный порядок):\n"
+          "======================================================================"
+          "\n", fileout_sorted);
+
+    buble_sort(arr, (size_t) arr_length, sizeof(char*), cmp_func2);
+    write_data_file(fileout_sorted, arr);
+
+    fputs("======================================================================"
+          "\n\n", fileout_sorted);
+
+
+    fputs("======================================================================"
+            "\nВСТРОЕННАЯ СОРТИРОВКА (прямой порядок):\n"
+            "======================================================================"
+            "\n", fileout_sorted);
+
+    qsort(arr, (size_t) arr_length, sizeof(char*), cmp_func1);
+    write_data_file(fileout_sorted, arr);
+
+    fputs("======================================================================"
+          "\n\n", fileout_sorted);
+
+
+    fputs("======================================================================"
+          "\nВСТРОЕННАЯ СОРТИРОВКА (прямой порядок):\n"
+          "======================================================================"
+          "\n", fileout_sorted);
+
+    qsort(arr, (size_t) arr_length, sizeof(char*), cmp_func2);
+    write_data_file(fileout_sorted, arr);
+
+    fputs("======================================================================"
+          "", fileout_sorted);
+
+
+    fputs("======================================================================"
+          "\nНАЧАЛЬНЫЙ ТЕКСТ:\n"
+          "======================================================================"
+          "\n", fileout_original);
+
+    fputs(data_0, fileout_original);
+
+    fputs("======================================================================"
+          "", fileout_original);
+}
+
+
+void output_files(char* arr[], int arr_length, char* data_0)                               // вывод всей инфы в файлы
 {
     ASSERT(arr != NULL);
     ASSERT(data_0 != NULL);
 
+    FILE* fileout_sorted = fopen(FILENAME_OUTPUT_SORTED, "w");
+    FILE* fileout_original = fopen(FILENAME_OUTPUT_ORIGINAL, "w");
 
-    printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  \n"
-           "СОБСТВЕННАЯ СОРТИРОВКА (прямой порядок):"
-           "\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+    sort_and_output(fileout_sorted, fileout_original, arr, arr_length, data_0);
 
-    buble_sort(arr, (size_t) arr_length, sizeof(char*), cmp_func1);
-
-    printf_arr(arr);
-    printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n");
-
-
-//     printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"
-//            "СОБСТВЕННАЯ СОРТИРОВКА (обратный порядок):"
-//            "\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-//
-//     buble_sort(arr, arr_length, cmp_func2);
-//
-//     printf_arr(arr);
-//     printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n");
-
-
-
-    printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"
-           "ВСТРОЕННАЯ СОРТИРОВКА (прямой порядок):"
-           "\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-
-    qsort(arr, (size_t) arr_length, sizeof(char*), cmp_func1);
-
-    printf_arr(arr);
-    printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n");
-
-
-//     printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"
-//            "ВСТРОЕННАЯ СОРТИРОВКА (обратный порядок):"
-//            "\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-//
-//     qsort(arr, (size_t) arr_length, sizeof(char*), cmp_func2);
-//
-//     printf_arr(arr);
-//     printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n");
-
-
-
-    printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"
-           "НАЧАЛЬНЫЙ МАССИВ:"
-           "\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-    printf("%s", data_0);
-    printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n");
+    fclose(fileout_sorted);
+    fclose(fileout_original);
 }
 
 
@@ -238,15 +353,22 @@ int main()
 {
     char* data_0 = nullptr;
     char* data = nullptr;
-    const char* file_name = "text.txt";
 
-    int file_length = open_read_close_file(file_name, &data, &data_0);
+    int file_length = open_read_close_file(&data, &data_0);
     int arr_length = cymb_count('\n', data);
 
     char* arr[arr_length+1] = {};
 
     create_ptr_arr(&data, arr, file_length, arr_length);
-    sort_and_output(arr, arr_length, data_0);
+    output_files(arr, arr_length, data_0);
+
+
+//
+//     reverse_str(str1, n1, str1_rev);
+//     reverse_str(str2, n2, str2_rev);
+
+    // printf("%s VS %s -> %d\n", str1, str2, cmp_func2(&str1, &str2));
+    // printf("%s --> %s\n\n%s --> %s\n", str1, str1_rev, str2, str2_rev);
 
     return 0;
 }

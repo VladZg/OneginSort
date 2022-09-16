@@ -253,7 +253,7 @@ int main()
     char data_0[2000] = {};
     char data[2000] = {};
     char* data_ptr = data;
-    const char file_name[] = "text.txt";
+    const char file_name[] = "text_input.txt";
 
 
     // сделать динамическую память (глава 8.7 и страница 242)
