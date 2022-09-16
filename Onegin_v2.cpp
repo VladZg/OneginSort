@@ -9,7 +9,7 @@
 
 
 
-void printf_arr(char** arr)                                                               // распечатка массива
+void printf_arr(char** arr)                                                     // распечатка массива
 {
     ASSERT(arr != NULL);
 
@@ -20,13 +20,12 @@ void printf_arr(char** arr)                                                     
 }
 
 
-int read_file_data(FILE* file, char** data_ptr, int file_size)                             // считывание файла в строку
+int read_file_data(FILE* file, char** data_ptr, int file_size)                  // считывание файла в строку
 {
     ASSERT(file != NULL);
     ASSERT(data_ptr != NULL);
 
     *data_ptr = (char*) calloc(file_size, sizeof(char));
-    free(*data_ptr);
 
     if (!(*data_ptr))
         return 0;
@@ -35,7 +34,7 @@ int read_file_data(FILE* file, char** data_ptr, int file_size)                  
 }
 
 
-void write_data_file(FILE* fileout, char** arr)                                           // запись массива в файл
+void write_data_file(FILE* fileout, char** arr)                                 // запись массива в файл
 {
     ASSERT(fileout != 0);
     ASSERT(arr != 0);
@@ -48,7 +47,7 @@ void write_data_file(FILE* fileout, char** arr)                                 
 }
 
 
-int open_read_close_file(char** data_ptr, char** data_0_ptr)                               // открытие, считывание, закрытие файла
+int open_read_close_file(char** data_ptr, char** data_0_ptr)                    // открытие, считывание, закрытие файла
 {
     ASSERT(data_ptr != NULL);
     ASSERT(data_0_ptr != NULL);
@@ -62,7 +61,6 @@ int open_read_close_file(char** data_ptr, char** data_0_ptr)                    
     int n = read_file_data(file, data_ptr, file_size);
 
     *data_0_ptr = (char*) calloc(file_size, sizeof(char));
-    free(*data_0_ptr);
 
     if (!(*data_0_ptr))
         return 0;
@@ -76,7 +74,7 @@ int open_read_close_file(char** data_ptr, char** data_0_ptr)                    
 
 
 void create_ptr_arr(char** data_ptr, char** arr,
-                    int data_length, int arr_length)                                       // заполнение массива указателей на строки
+                    int data_length, int arr_length)                            // заполнение массива указателей на строки
 {
     ASSERT(data_ptr != NULL);
     ASSERT(arr != NULL);
@@ -103,7 +101,7 @@ void create_ptr_arr(char** data_ptr, char** arr,
 }
 
 
-int cymb_count(char cymb, char* string)                                                    // подсчёт кол-ва заданных символов в строке
+int cymb_count(char cymb, char* string)                                         // подсчёт кол-ва заданных символов в строке
 {
     ASSERT(string != NULL);
 
@@ -119,16 +117,14 @@ int cymb_count(char cymb, char* string)                                         
 }
 
 
-int is_letter_or_0(char cymb)                                                              // проверка на небукву или \0
+int is_letter_or_0(char cymb)                                                   // проверка на небукву или \0
 {
-    if (isalpha(cymb) || (cymb == '\0'))
-        return 1;
-
-    return 0;
+    return isalpha(cymb) || (cymb == '\0');
 }
 
 
-void skip_non_letters(const char** string1, const char** string2, const int direction)     // пропускание первых небукв
+void skip_non_letters(const char** string1, const char** string2,
+                      const int direction)                                      // пропускание первых небукв
 {
     ASSERT(string1 != NULL);
     ASSERT(string2 != NULL);
@@ -148,82 +144,68 @@ void skip_non_letters(const char** string1, const char** string2, const int dire
 }
 
 
-int strcmp_letters_only_func1(const char** string1, const char** string2)                  // сравнение строк без знаков пунктуации
+int strcmp_letters_only_func(const char** string1, const char** string2,
+                             const int direction)                               // сравнение строк без знаков пунктуации
 {
     ASSERT(string1 != NULL);
     ASSERT(string2 != NULL);
 
-    skip_non_letters(string1, string2, 1);
+    if (direction == -1)
+    {
+        *string1 += strlen(*string1) - 1;
+        *string2 += strlen(*string2) - 1;
+    }
+
+    skip_non_letters(string1, string2, direction);
 
     while(**string1 == **string2)
     {
         if (**string1 == '\0')
             return 0;
 
-        (*string1)++;
-        (*string2)++;
+        *string1 += direction;
+        *string2 += direction;
     }
 
     return **string1 - **string2;
 }
 
 
-int strcmp_letters_only_func2(const char** string1, const char** string2)                  // сравнение строк без знаков пунктуации
-{
-    ASSERT(string1 != NULL);
-    ASSERT(string2 != NULL);
-
-    *string1 += strlen(*string1) - 1;
-    *string2 += strlen(*string2) - 1;
-
-    skip_non_letters(string1, string2, -1);
-
-    while(**string1 == **string2)
-    {
-        if (**string1 == '\0')
-            return 0;
-
-        (*string1)--;
-        (*string2)--;
-    }
-    return **string1 - **string2;
-}
-
-
-int cmp_func(const void* str1_ptr, const void* str2_ptr,
-             int (*strcmp_letters_only_func)(const char** string1, const char** string2))  // общая функция сравнения void* строк
+int cmp_func(const void* str1_ptr, const void* str2_ptr, const int direction,
+             int (*strcmp_letters_only_func)(const char** string1,
+             const char** string2, const int direction))                        // общая функция сравнения void* строк
 {
     ASSERT(str1_ptr != NULL);
     ASSERT(str2_ptr != NULL);
     ASSERT (strcmp_letters_only_func != NULL);
 
-    const char *str1 = *(const char**) str1_ptr;
-    const char *str2 = *(const char**) str2_ptr;
+    const char *string1 = *(const char**) str1_ptr;
+    const char *string2 = *(const char**) str2_ptr;
 
-    return strcmp_letters_only_func(&str1, &str2);
+    return strcmp_letters_only_func(&string1, &string2, direction);
 }
 
 
-int cmp_func1(const void* str1_ptr, const void* str2_ptr)                                  // функция сравнения слева-направо
+int cmp_func1(const void* str1_ptr, const void* str2_ptr)                       // функция сравнения слева-направо
 {
     ASSERT(str1_ptr != NULL);
     ASSERT(str2_ptr != NULL);
 
-    return cmp_func(str1_ptr, str2_ptr, strcmp_letters_only_func1);
+    return cmp_func(str1_ptr, str2_ptr, 1, strcmp_letters_only_func);
 }
 
 
-int cmp_func2(const void* str1_ptr, const void* str2_ptr)                                  // функция сравнения справа-налево
+int cmp_func2(const void* str1_ptr, const void* str2_ptr)                       // функция сравнения справа-налево
 {
     ASSERT(str1_ptr != NULL);
     ASSERT(str2_ptr != NULL);
 
-    return cmp_func(str1_ptr, str2_ptr, strcmp_letters_only_func2);
+    return cmp_func(str1_ptr, str2_ptr, -1, strcmp_letters_only_func);
 }
 
 
 void buble_sort(char* arr[], size_t arr_length, int size,
-                int (*cmp_func)(const void* str1, const void* str2))                       // собственная сортировка (пузырьком)
+                int (*cmp_func)(const void* str1, const void* str2))            // собственная сортировка (пузырьком)
 {
     ASSERT(arr != NULL);
     ASSERT(cmp_func != NULL);
@@ -243,21 +225,26 @@ void buble_sort(char* arr[], size_t arr_length, int size,
 }
 
 
-// void buble_sort(void* arr, size_t arr_length, size_t size,
+// void swap(void* l, void* r)                                                  // своп указателей друг на друга
+// {
+//
+// }
+
+
+// void buble_sort(void* arr, size_t arr_length, size_t size,                   // обобщённая собственная сортировка (пузырьком)
 //                 int (*cmp_func)(const void* str1, const void* str2))                       // обобщённая собственная сортировка (пузырьком)
 // {
 //     ASSERT(arr != NULL);
 //     ASSERT(cmp_func != NULL);
 //
+//     char* Arr = (char*) arr;
 //     for (int i = (int) arr_length; i >= 0; i--)
 //     {
 //         for (int j = 0; j < i-1; j++)
 //         {
-//             if (cmp_func(&arr[j*size], &arr[(j+1)*size]) >= 0)
+//             if (cmp_func(Arr + j*size, Arr + (j+1)*size) >= 0)
 //             {
-//                 void* temp = arr[j*size];
-//                 arr[j*size] = arr[(j+1)*size];
-//                 arr[(j+1)*size] = temp;
+//                 swap(Arr + j*size, Arr + (j+1)*size);
 //             }
 //         }
 //     }
@@ -265,7 +252,7 @@ void buble_sort(char* arr[], size_t arr_length, int size,
 
 
 void sort_and_output(FILE* fileout_sorted, FILE* fileout_original,
-                     char* arr[], int arr_length, char* data_0)                            // сортировки и вывод массивов
+                     char* arr[], int arr_length, char* data_0)                 // сортировки и вывод массивов
 {
     ASSERT(arr != NULL);
     ASSERT(data_0 != NULL);
@@ -298,9 +285,9 @@ void sort_and_output(FILE* fileout_sorted, FILE* fileout_original,
 
 
     fputs("======================================================================"
-            "\nВСТРОЕННАЯ СОРТИРОВКА (прямой порядок):\n"
-            "======================================================================"
-            "\n", fileout_sorted);
+          "\nВСТРОЕННАЯ СОРТИРОВКА (прямой порядок):\n"
+          "======================================================================"
+          "\n", fileout_sorted);
 
     qsort(arr, (size_t) arr_length, sizeof(char*), cmp_func1);
     write_data_file(fileout_sorted, arr);
@@ -310,7 +297,7 @@ void sort_and_output(FILE* fileout_sorted, FILE* fileout_original,
 
 
     fputs("======================================================================"
-          "\nВСТРОЕННАЯ СОРТИРОВКА (прямой порядок):\n"
+          "\nВСТРОЕННАЯ СОРТИРОВКА (обратный порядок):\n"
           "======================================================================"
           "\n", fileout_sorted);
 
@@ -326,6 +313,7 @@ void sort_and_output(FILE* fileout_sorted, FILE* fileout_original,
           "======================================================================"
           "\n", fileout_original);
 
+
     fputs(data_0, fileout_original);
 
     fputs("======================================================================"
@@ -333,7 +321,7 @@ void sort_and_output(FILE* fileout_sorted, FILE* fileout_original,
 }
 
 
-void output_files(char* arr[], int arr_length, char* data_0)                               // вывод всей инфы в файлы
+void output_files(char* arr[], int arr_length, char* data_0)                    // вывод всей инфы в файлы
 {
     ASSERT(arr != NULL);
     ASSERT(data_0 != NULL);
@@ -347,6 +335,12 @@ void output_files(char* arr[], int arr_length, char* data_0)                    
     fclose(fileout_original);
 }
 
+
+void cleaner(char* data, char* data_0, int file_length)                         // очистка динамической памяти
+{
+    free((void*) (data-file_length));
+    free((void*) data_0);
+}
 
 
 int main()
@@ -362,13 +356,7 @@ int main()
     create_ptr_arr(&data, arr, file_length, arr_length);
     output_files(arr, arr_length, data_0);
 
-
-//
-//     reverse_str(str1, n1, str1_rev);
-//     reverse_str(str2, n2, str2_rev);
-
-    // printf("%s VS %s -> %d\n", str1, str2, cmp_func2(&str1, &str2));
-    // printf("%s --> %s\n\n%s --> %s\n", str1, str1_rev, str2, str2_rev);
+    cleaner(data, data_0, file_length);
 
     return 0;
 }
