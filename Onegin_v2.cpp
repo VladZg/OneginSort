@@ -9,7 +9,7 @@
 
 
 
-void printf_arr(char* arr[])                                                               // распечатка массива
+void printf_arr(char** arr)                                                               // распечатка массива
 {
     ASSERT(arr != NULL);
 
@@ -35,7 +35,7 @@ int read_file_data(FILE* file, char** data_ptr, int file_size)                  
 }
 
 
-void write_data_file(FILE* fileout, char* arr[])                                           // запись массива в файл
+void write_data_file(FILE* fileout, char** arr)                                           // запись массива в файл
 {
     ASSERT(fileout != 0);
     ASSERT(arr != 0);
@@ -75,7 +75,7 @@ int open_read_close_file(char** data_ptr, char** data_0_ptr)                    
 }
 
 
-void create_ptr_arr(char** data_ptr, char* arr[],
+void create_ptr_arr(char** data_ptr, char** arr,
                     int data_length, int arr_length)                                       // заполнение массива указателей на строки
 {
     ASSERT(data_ptr != NULL);
