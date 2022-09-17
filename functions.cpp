@@ -8,7 +8,7 @@
 #include "defines.h"
 
 
-int size_of_file        (FILE* file                             ) // узнать размер файла
+int  size_of_file       (FILE* file                             ) // узнать размер файла
 {
     ASSERT(file != NULL);
 
@@ -24,8 +24,7 @@ int  read_file_to_data  (FILE* file, char** data, int file_size ) // считы�
 
     *data = (char*) calloc(file_size, sizeof(char));
 
-    if (!(*data))
-        return -1;
+    ASSERT(*data != NULL);
 
     return fread(*data, sizeof(char), file_size, file);
 }
@@ -35,9 +34,9 @@ void write_text_in_file (FILE* file, char** text                ) // запис�
     ASSERT(file != NULL);
     ASSERT(text != NULL);
 
-    while (*text != NULL)
+    for (int i = 0; text[i] != NULL;)
     {
-        fputs(*text++, file);
+        fputs(text[i++], file);
         fputs("\n", file);
     }
 }
@@ -136,7 +135,7 @@ int  strcmp_letters_only (const char** string1,  const char** string2,  const in
 }
 
 int  cmp                 (const void*  str1_ptr, const void*  str2_ptr, const int direction,
-                                                                                              int (*strcmp_letters_only_func)(
+                                                                                              int (*strcmp_letters_only)(
                           const char** string1,  const char** string2,  const int direction)) // общая функция сравнения void* строк
 {
     ASSERT(str1_ptr != NULL);
@@ -166,38 +165,37 @@ int  cmp_right_to_left   (const void*  str1_ptr, const void*  str2_ptr          
 }
 
 
-void buble_sort(char* arr[], size_t arr_length, int size, int (*cmp)(const void* str1, const void* str2)) // собственная сортировка (пузырьком)
+void buble_sort(char** text, size_t text_lines_amount, int size, int (*cmp)(const void* str1, const void* str2)) // собственная сортировка (пузырьком)
 {
-ASSERT(arr != NULL);
-ASSERT(cmp != NULL);
+    ASSERT(text != NULL);
+    ASSERT(cmp != NULL);
 
-for (int i = (int) arr_length; i >= 0; i--)
-{
-for (int j = 0; j < i-1; j++)
-{
-if (cmp(&arr[j], &arr[j+1]) >= 0)
-{
-    char* temp = arr[j];
-    arr[j] = arr[j+1];
-    arr[j+1] = temp;
-}
-}
-}
+    for (int i = (int) text_lines_amount; i >= 0; i--)
+    {
+        for (int j = 0; j < i-1; j++)
+        {
+            if (cmp(text + j, text + (j+1)) >= 0)
+            {
+                char* temp = text[j];
+                text[j] = text[j+1];
+                text[j+1] = temp;
+            }
+        }
+    }
 }
 
 
 void fputs_original(FILE* file, char* data, int data_length) //печать в файл исходного текста
 {
+    ASSERT(file != NULL);
+    ASSERT(data != NULL);
+
     for (int i = 0; i < data_length; i++)
     {
-        if (*data != '\0')
-            fputc(*data, file);
+        if (data[i] != '\0')
+            fputc(data[i], file);
 
         else
             fputc('\n', file);
-
-        data++;
     }
-
-    data -= data_length;
 }
