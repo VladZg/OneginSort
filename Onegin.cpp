@@ -11,13 +11,12 @@
 
 int main()
 {
-    char* data_0 = nullptr;
     char* data = nullptr;
 
     FILE* fileinp = fopen(FILENAME_INPUT, "r");
 
-    int data_length = read_file(fileinp, &data, &data_0);
-    // int file_length = read_file(fileinp, &data);
+    int file_size = size_of_file(fileinp);
+    int data_length = read_file_to_data(fileinp, &data, file_size);
 
     fclose(fileinp);
 
@@ -44,13 +43,7 @@ int main()
     fclose(fileout_original);
 
 
-    // while (*text != NULL)
-    //     printf("%s", *text++);
-
-    // printf("%s", data);
-
     free(data);
-    free(data_0);
     free(text);
 
 
