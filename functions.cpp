@@ -8,51 +8,38 @@
 #include "defines.h"
 
 
-int read_data_from_file (FILE* file, char** data_ptr, int    file_size )  // считывание файла в строку
+int size_of_file        (FILE* file                             ) // узнать размер файла
 {
     ASSERT(file != NULL);
-    ASSERT(data_ptr != NULL);
 
-    *data_ptr = (char*) calloc(file_size, sizeof(char));
-
-    if (!(*data_ptr))
-        return 0;
-
-    return fread(*data_ptr, sizeof(char), file_size, file);
+    struct stat buf;
+    fstat(fileno(file), &buf);
+    return buf.st_size;
 }
 
-void write_data_file    (FILE* file, char** text                       )  // запись массива в файл
+int  read_file_to_data  (FILE* file, char** data, int file_size ) // считывание файла в строку
 {
-    ASSERT(file != 0);
-    ASSERT(text != 0);
+    ASSERT(file != NULL);
+    ASSERT(data != NULL);
+
+    *data = (char*) calloc(file_size, sizeof(char));
+
+    if (!(*data))
+        return -1;
+
+    return fread(*data, sizeof(char), file_size, file);
+}
+
+void write_text_in_file (FILE* file, char** text                ) // запись массива указателей в файл
+{
+    ASSERT(file != NULL);
+    ASSERT(text != NULL);
 
     while (*text != NULL)
     {
         fputs(*text++, file);
         fputs("\n", file);
     }
-}
-
-int read_file           (FILE* file, char** data_ptr, char** data_0_ptr) // открытие, считывание, закрытие файла
-// int read_file           (FILE* file, char** data_ptr) // открытие, считывание, закрытие файла
-{
-    ASSERT(data_ptr != NULL);
-    ASSERT(data_0_ptr != NULL);
-
-    struct stat buf;
-    fstat(fileno(file), &buf);
-    int file_size = buf.st_size;
-
-    int n = read_data_from_file(file, data_ptr, file_size);
-
-    *data_0_ptr = (char*) calloc(file_size, sizeof(char));
-
-    if (!(*data_0_ptr))
-        return 0;
-
-    strncpy(*data_0_ptr, *data_ptr, n);
-
-    return n;
 }
 
 
@@ -70,10 +57,6 @@ void fill_text(char* data, char** text, int data_length) // заполнение
             *data = '\0';
             data -= str_length;
             *text++ = data;
-            // *text += str_length;
-            // **text = '\0';
-            // *text -= str_length;
-            // text++;
             data += str_length;
             str_length = 0;
         }
@@ -83,7 +66,7 @@ void fill_text(char* data, char** text, int data_length) // заполнение
         data++;
     }
 
-    *text++ = NULL;
+    *text++ = nullptr;
 }
 
 
@@ -108,7 +91,7 @@ int is_letter_or_0 (char symb              ) // проверка на небук
 }
 
 
-void skip_non_letters   (const char** string1,  const char** string2,  const int direction ) // пропускание первых небукв
+void skip_non_letters    (const char** string1,  const char** string2,  const int direction ) // пропускание первых небукв
 {
     ASSERT(string1 != NULL);
     ASSERT(string2 != NULL);
@@ -127,7 +110,7 @@ void skip_non_letters   (const char** string1,  const char** string2,  const int
     }
 }
 
-int strcmp_letters_only (const char** string1,  const char** string2,  const int direction ) // сравнение строк без знаков пунктуации
+int  strcmp_letters_only (const char** string1,  const char** string2,  const int direction ) // сравнение строк без знаков пунктуации
 {
     ASSERT(string1 != NULL);
     ASSERT(string2 != NULL);
@@ -152,9 +135,9 @@ int strcmp_letters_only (const char** string1,  const char** string2,  const int
     return **string1 - **string2;
 }
 
-int cmp                 (const void*  str1_ptr, const void*  str2_ptr, const int direction,
-                                                                                             int (*strcmp_letters_only_func)(
-                         const char** string1,  const char** string2,  const int direction)) // общая функция сравнения void* строк
+int  cmp                 (const void*  str1_ptr, const void*  str2_ptr, const int direction,
+                                                                                              int (*strcmp_letters_only_func)(
+                          const char** string1,  const char** string2,  const int direction)) // общая функция сравнения void* строк
 {
     ASSERT(str1_ptr != NULL);
     ASSERT(str2_ptr != NULL);
@@ -166,7 +149,7 @@ int cmp                 (const void*  str1_ptr, const void*  str2_ptr, const int
     return strcmp_letters_only(&string1, &string2, direction);
 }
 
-int cmp_left_to_right   (const void*  str1_ptr, const void*  str2_ptr)                       // функция сравнения слева-направо
+int  cmp_left_to_right   (const void*  str1_ptr, const void*  str2_ptr                      ) // функция сравнения слева-направо
 {
     ASSERT(str1_ptr != NULL);
     ASSERT(str2_ptr != NULL);
@@ -174,7 +157,7 @@ int cmp_left_to_right   (const void*  str1_ptr, const void*  str2_ptr)          
     return cmp(str1_ptr, str2_ptr, 1, strcmp_letters_only);
 }
 
-int cmp_right_to_left   (const void*  str1_ptr, const void*  str2_ptr)                       // функция сравнения справа-налево
+int  cmp_right_to_left   (const void*  str1_ptr, const void*  str2_ptr                      ) // функция сравнения справа-налево
 {
     ASSERT(str1_ptr != NULL);
     ASSERT(str2_ptr != NULL);
@@ -200,4 +183,21 @@ if (cmp(&arr[j], &arr[j+1]) >= 0)
 }
 }
 }
+}
+
+
+void fputs_original(FILE* file, char* data, int data_length) //печать в файл исходного текста
+{
+    for (int i = 0; i < data_length; i++)
+    {
+        if (*data != '\0')
+            fputc(*data, file);
+
+        else
+            fputc('\n', file);
+
+        data++;
+    }
+
+    data -= data_length;
 }
