@@ -52,11 +52,11 @@ void fill_text(char* data, char** text, int data_length) // заполнение
     {
         if (*data == '\n')
         {
-            *data        = '\0';
-            data        -= str_length;
-            *text++      = data;
-            data        += str_length;
-            str_length = 0;
+            *data       = '\0';
+            data       -= str_length;
+            *text++     = data;
+            data       += str_length;
+            str_length  = 0;
         }
         else
             str_length++;
@@ -137,9 +137,9 @@ static int strcmp_letters_only(const char** string1, const char** string2, const
 static int cmp(const void*  str1_ptr, const void*  str2_ptr, const int direction,
                int (*strcmp_letters_only)(const char** string1, const char** string2, const int direction)) // общая функция сравнения void* строк
 {
-    ASSERT(str1_ptr != NULL);
-    ASSERT(str2_ptr != NULL);
-    ASSERT (strcmp_letters_only != NULL);
+    ASSERT(str1_ptr            != NULL);
+    ASSERT(str2_ptr            != NULL);
+    ASSERT(strcmp_letters_only != NULL);
 
     const char *string1 = *(const char**) str1_ptr;
     const char *string2 = *(const char**) str2_ptr;
@@ -167,7 +167,7 @@ int cmp_right_to_left(const void* str1_ptr, const void* str2_ptr)               
 void buble_sort(char** text, size_t text_lines_amount, int size, int (*cmp)(const void* str1, const void* str2)) // собственная сортировка (пузырьком)
 {
     ASSERT(text != NULL);
-    ASSERT(cmp != NULL);
+    ASSERT(cmp  != NULL);
 
     for (int i = (int) text_lines_amount; i >= 0; i--)
     {
