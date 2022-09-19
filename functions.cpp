@@ -8,7 +8,7 @@
 #include "defines.h"
 
 
-int  size_of_file       (FILE* file                             ) // узнать размер файла
+int size_of_file(FILE* file)                                  // узнать размер файла
 {
     ASSERT(file != NULL);
 
@@ -17,19 +17,18 @@ int  size_of_file       (FILE* file                             ) // узнат�
     return buf.st_size;
 }
 
-int  read_file_to_data  (FILE* file, char** data, int file_size ) // считывание файла в строку
+int read_file_to_data(FILE* file, char** data, int file_size) // считывание файла в строку
 {
     ASSERT(file != NULL);
     ASSERT(data != NULL);
 
     *data = (char*) calloc(file_size, sizeof(char));
-
     ASSERT(*data != NULL);
 
     return fread(*data, sizeof(char), file_size, file);
 }
 
-void write_text_in_file (FILE* file, char** text                ) // запись массива указателей в файл
+void write_text_in_file(FILE* file, char** text)              // запись массива указателей в файл
 {
     ASSERT(file != NULL);
     ASSERT(text != NULL);
@@ -53,10 +52,10 @@ void fill_text(char* data, char** text, int data_length) // заполнение
     {
         if (*data == '\n')
         {
-            *data = '\0';
-            data -= str_length;
-            *text++ = data;
-            data += str_length;
+            *data        = '\0';
+            data        -= str_length;
+            *text++      = data;
+            data        += str_length;
             str_length = 0;
         }
         else
@@ -69,7 +68,7 @@ void fill_text(char* data, char** text, int data_length) // заполнение
 }
 
 
-int symb_count     (char symb, char* string) // подсчёт кол-ва заданных символов в строке
+int symb_count(char symb, char* string) // подсчёт кол-ва заданных символов в строке
 {
     ASSERT(string != NULL);
 
@@ -84,13 +83,13 @@ int symb_count     (char symb, char* string) // подсчёт кол-ва за�
     return count;
 }
 
-int is_letter_or_0 (char symb              ) // проверка на небукву или \0
+static int is_letter_or_0(char symb)    // проверка на небукву или \0
 {
     return isalpha(symb) || (symb == '\0');
 }
 
 
-void skip_non_letters    (const char** string1,  const char** string2,  const int direction ) // пропускание первых небукв
+static void skip_non_letters(const char** string1, const char** string2, const int direction)               // пропускание первых небукв
 {
     ASSERT(string1 != NULL);
     ASSERT(string2 != NULL);
@@ -109,7 +108,7 @@ void skip_non_letters    (const char** string1,  const char** string2,  const in
     }
 }
 
-int  strcmp_letters_only (const char** string1,  const char** string2,  const int direction ) // сравнение строк без знаков пунктуации
+static int strcmp_letters_only(const char** string1, const char** string2, const int direction)             // сравнение строк без знаков пунктуации
 {
     ASSERT(string1 != NULL);
     ASSERT(string2 != NULL);
@@ -122,21 +121,21 @@ int  strcmp_letters_only (const char** string1,  const char** string2,  const in
 
     skip_non_letters(string1, string2, direction);
 
-    while(**string1 == **string2)
+    int i = 0;
+
+    while((*string1)[i] == (*string2)[i])
     {
-        if (**string1 == '\0')
+        if ((*string1)[i] == '\0')
             return 0;
 
-        *string1 += direction;
-        *string2 += direction;
+        i += direction;
     }
 
-    return **string1 - **string2;
+    return (*string1)[i] - (*string2)[i];
 }
 
-int  cmp                 (const void*  str1_ptr, const void*  str2_ptr, const int direction,
-                                                                                              int (*strcmp_letters_only)(
-                          const char** string1,  const char** string2,  const int direction)) // общая функция сравнения void* строк
+static int cmp(const void*  str1_ptr, const void*  str2_ptr, const int direction,
+               int (*strcmp_letters_only)(const char** string1, const char** string2, const int direction)) // общая функция сравнения void* строк
 {
     ASSERT(str1_ptr != NULL);
     ASSERT(str2_ptr != NULL);
@@ -148,7 +147,7 @@ int  cmp                 (const void*  str1_ptr, const void*  str2_ptr, const in
     return strcmp_letters_only(&string1, &string2, direction);
 }
 
-int  cmp_left_to_right   (const void*  str1_ptr, const void*  str2_ptr                      ) // функция сравнения слева-направо
+int cmp_left_to_right(const void* str1_ptr, const void* str2_ptr)                                           // функция сравнения слева-направо
 {
     ASSERT(str1_ptr != NULL);
     ASSERT(str2_ptr != NULL);
@@ -156,7 +155,7 @@ int  cmp_left_to_right   (const void*  str1_ptr, const void*  str2_ptr          
     return cmp(str1_ptr, str2_ptr, 1, strcmp_letters_only);
 }
 
-int  cmp_right_to_left   (const void*  str1_ptr, const void*  str2_ptr                      ) // функция сравнения справа-налево
+int cmp_right_to_left(const void* str1_ptr, const void* str2_ptr)                                           // функция сравнения справа-налево
 {
     ASSERT(str1_ptr != NULL);
     ASSERT(str2_ptr != NULL);
@@ -176,9 +175,10 @@ void buble_sort(char** text, size_t text_lines_amount, int size, int (*cmp)(cons
         {
             if (cmp(text + j, text + (j+1)) >= 0)
             {
+                // swap(text[j], text[j+1]);
                 char* temp = text[j];
-                text[j] = text[j+1];
-                text[j+1] = temp;
+                text[j]    = text[j+1];
+                text[j+1]  = temp;
             }
         }
     }
