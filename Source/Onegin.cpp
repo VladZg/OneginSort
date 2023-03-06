@@ -4,16 +4,20 @@
 #include <ctype.h>
 #include <stdlib.h>
 
-// #define NDEBUG
-#include "defines.h"
-#include "functions.h"
+#define FILENAME_INPUT              "./Texts/text_input.txt"
+#define FILENAME_OUTPUT_SORTED      "./Texts/text_output_sorted.txt"
+#define FILENAME_OUTPUT_ORIGINAL    "./Texts/text_output_original.txt"
 
+// #define NDEBUG
+#include "../Include/defines.h"
+#include "../Include/functions.h"
 
 int main()
 {
     char* data = nullptr;
 
     FILE* fileinp = fopen(FILENAME_INPUT, "r");
+    ASSERT(fileinp != nullptr)
 
     int file_size   = size_of_file(fileinp);
     int data_length = read_file_to_data(fileinp, &data, file_size);
