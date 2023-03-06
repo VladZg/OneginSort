@@ -2,7 +2,7 @@
 
 ## How to build project
 
-    To compile the project into "./main" run "./Makefile" in the root directory
+To compile the project into "./main" run ``make`` in the root directory
 
 ## Input
 
