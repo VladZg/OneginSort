@@ -9,8 +9,10 @@ APP_DIR = ./App/
 SRC = 	$(APP_DIR)Onegin.cpp		\
 	  	$(SRC_DIR)functions.cpp		\
 
-$(TARGET) :
+all: compile
+
+compile:
 	$(CC) $(CFLAGS) $(SRC) -o $(TARGET)
 
-clean :
+clean:
 	rm -f *.o $(TARGET)

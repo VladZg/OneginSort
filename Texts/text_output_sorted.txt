@@ -1,28 +1,68 @@
 ======================================================================
 СОБСТВЕННАЯ СОРТИРОВКА (прямой порядок):
 ======================================================================
-abpboasd
-asbbasdbs
-asvbdbhsd
-basdbabsdmn
-basdbbadsb
-basdbmanbxz
-bhbshbdhja
-cxzbczx
-xxzbcmbs
+
+And the sly baseness, fit to throttle,
+But God, how deadly dull to sample
+Friends of my Ruslan and Lyudmila,
+Let others learn from his example!
+My uncle -- high ideals inspire him;
+Onegin, my good friend, was littered
+Such were a young rake's meditations --
+There once I too strolled back and forth:
+"When will the devil come for you?"
+and bred upon the Neva's brink,
+and glumly serves the medicine bottle,
+and never played a shrewder trick.
+and never stir a foot away!
+and sighs, and asks oneself all through:
+as horses whirled him through the dust.
+but I'm allergic to the North...
+but when past joking he fell sick,
+by will of Zeus, the high and just,
+he really forced one to admire him --
+let me acquaint you on the nail
+of entertaining the half-dead:
+one smoothes the pillows down in bed,
+reader, or where you've shone and glittered!
+sickroom attendance night and day
+the legatee of his relations --
+where you were born as well, I think,
+with this the hero of my tale:
+without preliminary feeler
 ======================================================================
 
 ======================================================================
 ВСТРОЕННАЯ СОРТИРОВКА (обратный порядок):
 ======================================================================
-bhbshbdhja
-basdbbadsb
-abpboasd
-asvbdbhsd
-basdbabsdmn
-asbbasdbs
-xxzbcmbs
-cxzbczx
-basdbmanbxz
+
+Friends of my Ruslan and Lyudmila,
+of entertaining the half-dead:
+one smoothes the pillows down in bed,
+Onegin, my good friend, was littered
+reader, or where you've shone and glittered!
+with this the hero of my tale:
+But God, how deadly dull to sample
+Let others learn from his example!
+and glumly serves the medicine bottle,
+And the sly baseness, fit to throttle,
+and sighs, and asks oneself all through:
+but I'm allergic to the North...
+There once I too strolled back and forth:
+and never played a shrewder trick.
+but when past joking he fell sick,
+where you were born as well, I think,
+and bred upon the Neva's brink,
+let me acquaint you on the nail
+he really forced one to admire him --
+My uncle -- high ideals inspire him;
+without preliminary feeler
+the legatee of his relations --
+Such were a young rake's meditations --
+as horses whirled him through the dust.
+by will of Zeus, the high and just,
+"When will the devil come for you?"
+sickroom attendance night and day
+and never stir a foot away!
 ======================================================================
 
