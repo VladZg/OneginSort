@@ -1,6 +1,6 @@
 # OneginSort
 
- Program that sorts text lines in two orders.
+ Program sorts text lines in two orders: forward and backward.
 
 ## How to build project
 
