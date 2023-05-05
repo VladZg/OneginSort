@@ -1,26 +1,28 @@
-# Programm that sorts text
+# OneginSort
+
+ Program that sorts text lines in two orders.
 
 ## How to build project
 
- To compile the project into "./main" run ``make`` in the root directory
+ To compile the project run ``make`` in the root directory, it will create app file``./main``.
 
 ## Input
 
- In file "./Texts/text_input.txt" type text for sort
+ In file ``./Texts/text_input.txt`` type text for sort.
 
 ## Output
 
- In file "./Texts/text_output_sorted.txt" after run "./main" you can see your text sorted in 2 ways
+ Run ``./main``, after it in file ``./Texts/text_output_sorted.txt`` you will see your text sorted in 2 orders: forward and backward.
 
 ## Example of work
 
- Basic example of sorting text of A.S.Pushkin poem "Eugene Onegin".
+ Basic example of sorting is work with text of A.S.Pushkin poem "Eugene Onegin". Initially, program goal was to process it.
 
- ./Texts/text_input.txt:
+ ``./Texts/text_input.txt``:
 
  !["text_input"](./Pictures/text_input_example.png)
 
- ./Texts/text_output_sorted.txt:
+ ``./Texts/text_output_sorted.txt``:
 
  !["text_output_1"](./Pictures/text_sorted_example1.png)
  !["text_output_2"](./Pictures/text_sorted_example2.png)
